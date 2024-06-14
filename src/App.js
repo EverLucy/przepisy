@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Header from './components/Header';
+import SearchBar from './components/SearchBar';
+import RecipeList from './components/RecipeList';
+import axios from 'axios';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [recipes, setRecipes] = useState([]);
+
+    const handleSearch = async (query) => {
+        try {
+            const response = await axios.get(`https://api.edamam.com/api/recipes/v2`, {
+                params: {
+                    q: query,
+                    app_id: 'ca475a30',
+                    app_key: '1e60d79786006365af01468ab2c20acc',
+                    type: 'public'
+                }
+            });
+            setRecipes(response.data.hits);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    return (
+        <div>
+            <Header />
+            <SearchBar onSearch={handleSearch} />
+            <RecipeList recipes={recipes} />
+        </div>
+    );
 }
 
 export default App;
